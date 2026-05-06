@@ -9,13 +9,32 @@
 
 ## 2. 最新バージョンの主要機能
 
+### Go 1.22（2024年2月リリース）
+
+- **ループ変数セマンティクス修正**: `for`ループの各イテレーションで新しい変数を作成（goroutineキャプチャバグの根本解決）
+- **整数に対するrange**: `for i := range 10 { ... }` が有効な構文に
+- **`net/http` ルーティング強化**: デフォルトServeMuxがメソッドとワイルドカードをサポート（例: `GET /items/{id}`）
+
+### Go 1.23（2024年8月リリース）
+
+- **Range over function types（イテレータ）**: `for/range`文がイテレータ関数に対応
+  - `func(yield func() bool)` / `func(yield func(V) bool)` / `func(yield func(K, V) bool)`
+- `slices`/`maps`パッケージにイテレータ対応関数を追加
+- **`unique`パッケージ**: 値のインターニング（正規化）用の新パッケージ
+
 ### Go 1.24（2025年2月リリース）
 
 - **ジェネリック型エイリアス** の完全サポート
 - **ツールディレクティブ**: `go.mod` に `tool` ディレクティブを追加し、実行可能な依存関係を追跡（`tools.go` ワークアラウンドが不要に）
 - **Swiss Tables ベースの新しいmap実装**: より効率的なメモリ割り当て
 - **`go:wasmexport`**: WebAssemblyホストへの関数エクスポート用コンパイラディレクティブ
-- ランタイム内部mutexの新実装
+- **Weak Pointers / `runtime.AddCleanup`**: `runtime.SetFinalizer`に代わる新しいファイナライゼーション機構
+- **FIPS 140-3準拠**: Go暗号モジュールの透過的なFIPS対応
+- **ポスト量子暗号**: X25519MLKEM768鍵交換がデフォルト有効
+- **`testing/synctest`**（実験的）: フェイクタイムによる並行コードのテスト
+- **`testing.B.Loop`**: より簡潔で高速なベンチマークループ
+- **`os.Root`**: 特定ディレクトリにスコープされたファイルシステム操作
+- ランタイム内部mutexの新実装、GCポーズ時間15-25%削減
 
 ### Go 1.25（2025年9月リリース）
 
@@ -26,11 +45,13 @@
 
 ### Go 1.26（2026年2月リリース）
 
-- **Green Tea GC**: 実験的だったガベージコレクタがデフォルトで有効化
+- **Green Tea GC**: 実験的だったガベージコレクタがデフォルトで有効化（実ワークロードでGCオーバーヘッド10-40%削減）
 - **`new`関数の拡張**: オペランドに式を指定して初期値を設定可能
 - **自己参照ジェネリック型**: 型パラメータリスト内で自身を参照可能に
+- **`go fix` 刷新**: アナライザベースのコード自動モダナイズ（`//go:fix inline` / `//go:fix forward`ディレクティブ）
 - **cgoオーバーヘッド約30%削減**
 - スライスのバッキングストアをスタック上に割り当てるケースが増加
+- **新パッケージ**: `crypto/hpke`、`crypto/mlkem/mlkemtest`、`testing/cryptotest`
 - **実験的パッケージ**: `simd/archsimd`（SIMD演算）、`runtime/secret`（秘密情報の安全な消去）
 
 ## 3. 人気フレームワーク・ライブラリ
@@ -85,10 +106,14 @@ Go言語のAI/ML領域での存在感が急速に拡大している。
 
 Goはクラウドネイティブのデファクト言語としての地位を確立：
 
-- **Kubernetes** - コンテナオーケストレーション
+- **Kubernetes** - コンテナオーケストレーション（本番環境利用率82%）
 - **Docker** - コンテナプラットフォーム
 - **Terraform** - Infrastructure as Code
+- **Prometheus** - 監視・アラート
+- **OpenTelemetry** - オブザーバビリティフレームワーク
+- **Istio** - サービスメッシュ
 - **100万人以上** の開発者がクラウド環境でGoを使用
+- プラットフォームエンジニアリングでのカスタムオペレータ・コントローラ開発が活発
 
 ## 6. 開発者トレンド（2025年サーベイより）
 
@@ -128,3 +153,8 @@ Goはクラウドネイティブのデファクト言語としての地位を確
 - [AI and Go in 2026 - Applied Go](https://appliedgo.net/spotlight/ai-and-go/)
 - [Top 7 Best Golang AI Agent Frameworks 2026](https://reliasoftware.com/blog/golang-ai-agent-frameworks)
 - [Popular Go Web Frameworks - JetBrains GoLand Blog](https://blog.jetbrains.com/go/2026/04/28/popular-golang-web-frameworks/)
+- [Go 1.24 Release Notes](https://go.dev/doc/go1.24)
+- [Go 1.22 Release Notes](https://go.dev/doc/go1.22)
+- [Range Over Function Types - Go Blog](https://go.dev/blog/range-functions)
+- [Using go fix to modernize Go code - Go Blog](https://go.dev/blog/gofix)
+- [Building LLM-powered applications in Go - Go Blog](https://go.dev/blog/llmpowered)
