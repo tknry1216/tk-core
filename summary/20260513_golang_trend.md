@@ -4,7 +4,29 @@
 
 ---
 
-## 📌 Go 1.26 リリース（2026年2月10日）
+## 📌 直近のGoリリース概要
+
+### Go 1.24（2025年2月）
+
+- **ジェネリック型エイリアス**: 型エイリアスが定義型と同様にパラメータ化可能に
+- **Weak Pointer（弱参照ポインタ）**: GCによるメモリ回収を妨げない弱参照が導入
+- **Swiss Tablesベースの新map実装**: ビルトインmapの高速化
+- **`go.mod` に `tool` ディレクティブ追加**: 従来の `tools.go` による回避策が不要に
+- **ポスト量子暗号**: X25519MLKEM768鍵交換メカニズムがデフォルト有効に
+- **FIPS 140-3準拠メカニズム**、**Encrypted Client Hello (ECH)** サポート
+- **`os.Root` 型**: 特定ディレクトリ内でのファイルシステム操作用
+- **`testing/synctest` パッケージ**（実験的）: フェイククロックによる並行コードテスト
+
+### Go 1.25（2025年8月）
+
+- **Core Types概念の削除**: 仕様から「コア型」の概念を完全撤廃
+- **実験的Green Tea GC**: 小オブジェクトのマーキング・スキャン性能向上（10〜40%のGCオーバーヘッド削減）
+- **実験的 `encoding/json/v2`**: 従来の `encoding/json` より **2〜10倍高速**。正式採用に向けワーキンググループが検討中
+- **`go.mod` の `ignore` ディレクティブ**: goコマンドが無視するディレクトリを指定可能に
+- **DWARF version 5**: デバッグデータの容量削減とリンク時間の短縮
+- **GOMAXPROCS動作変更**: Linuxでcgroupの帯域制限を考慮するように
+
+### Go 1.26（2026年2月10日）— 最新安定版
 
 Go 1.26 が2026年2月にリリースされ、パフォーマンスの大幅な向上、言語仕様の改善、セキュリティ強化が実現された。
 
@@ -34,8 +56,12 @@ Green Tea GCは、マーキング・スキャンにおけるローカリティ�
 
 - **`go fix` サブコマンドの完全刷新**: コードの近代化機会を特定するアルゴリズムスイートを搭載
 - **goroutineleak プロファイル**（実験的）: リークしたgoroutineの検出・レポートが可能に（Go 1.27でデフォルト有効化予定）
+- **実験的SIMDパッケージ (`simd/archsimd`)**: SIMD命令への直接アクセスを提供
+- **pprofのFlame Graphビューがデフォルト化**
 
 **参考リンク:**
+- [Go 1.24 Release Notes](https://go.dev/doc/go1.24)
+- [Go 1.25 Release Notes](https://go.dev/doc/go1.25)
 - [Go 1.26 Release Notes](https://go.dev/doc/go1.26)
 - [Go 1.26 is released - Go Blog](https://go.dev/blog/go1.26)
 - [Go 1.26 unleashes performance-boosting Green Tea GC - InfoWorld](https://www.infoworld.com/article/4131097/go-1-26-unleashes-performance-boosting-green-tea-gc.html)
@@ -48,11 +74,23 @@ Green Tea GCは、マーキング・スキャンにおけるローカリティ�
 
 Go 1.25で「Core Types」概念が完全に撤廃された。非ジェネリックコードは具象型に基づくルールで直接定義され、ジェネリックコードは型セットチェックで統一的に操作の有効性を検証する方式に移行した。
 
+### ジェネリクス進化の時系列
+
+| バージョン | 変更内容 |
+|---|---|
+| Go 1.18 (2022) | ジェネリクス初導入、コア型の概念 |
+| Go 1.23 (2024) | range-over-functionイテレータの正式統合 |
+| Go 1.24 (2025/2) | ジェネリック型エイリアスの完全サポート |
+| Go 1.25 (2025/8) | 仕様からコア型の概念を完全削除 |
+| Go 1.26 (2026/2) | ジェネリック型の自己参照制約を緩和 |
+| 2026/3 承認 | ジェネリックメソッドが実装フェーズへ（[#77273](https://github.com/golang/go/issues/77273)） |
+
 ### 普及状況
 
 - 2025年時点で **新規Goプロジェクトの73%** がジェネリクスを広範に使用（2022年は12%）
 - Uber、Netflix、Googleなどの大手企業がコアライブラリをジェネリックパターンで全面書き換え
 - `slices`、`maps` パッケージがジェネリクスにより自然な使用感に
+- ただし、**インターフェースにジェネリクスを含められない**という制限は残存
 
 **参考リンク:**
 - [Goodbye core types - Go Blog](https://go.dev/blog/coretypes)
@@ -70,16 +108,24 @@ Model Context Protocol（MCP）の公式Go SDKがv1.0.0として安定版リリ�
 - ベンダー中立のガバナンス体制が確立され、業界全体の支持を獲得
 - Go言語がAIエージェント時代のインフラ言語として位置づけられる
 
-### AI開発での活用
+### AI/LLM関連ライブラリ
 
-- MCPサーバー/クライアントの構築が容易に
-- Azure Cosmos DBなどクラウドサービスとのAIツール連携が公式にサポート
-- サードパーティSDK（`go-mcp` 等）も活発に開発中
+| ライブラリ | 概要 |
+|-----------|------|
+| **Go MCP SDK (公式)** | `github.com/modelcontextprotocol/go-sdk` — MCPクライアント・サーバー構築用 |
+| **mcp-go** | コミュニティ実装。MCP仕様2025-11-25対応、1,880+プロジェクトにインポート |
+| **GoAI** | 22以上のLLMプロバイダをサポート（依存関係わずか2つ）。MCPクライアント組み込み対応 |
+| **LangChainGo** | LangChainのGo実装。チェーン、エージェント、ツール、エンベディング等 |
+
+### GoのAI領域での位置づけ
+
+GoにはPythonのようなネイティブML/DLエコシステム（PyTorch、TensorFlow等）は存在しないが、**AIインフラ・ツーリング層**（MCPサーバー、APIゲートウェイ、推論パイプラインのオーケストレーション）での活用が急速に拡大。MCPは月間9,700万以上のダウンロードを記録し、Anthropic・OpenAI・Google・Microsoftが支持している。
 
 **参考リンク:**
 - [Go MCP SDK - GitHub](https://github.com/modelcontextprotocol/go-sdk)
 - [MCP Go SDK Quick Start](https://go.sdk.modelcontextprotocol.io/quick_start/)
 - [Build AI Tooling in Go with the MCP SDK - Azure Blog](https://devblogs.microsoft.com/cosmosdb/build-ai-tooling-in-go-with-the-mcp-sdk-connecting-ai-apps-to-databases/)
+- [GoAI: A Go AI SDK for 22+ LLM Providers](https://blog.anh.sh/why-and-how-i-built-a-go-ai-sdk)
 
 ---
 
@@ -145,22 +191,48 @@ Go初のプロフェッショナルグラフィックスエコシステムが登
 
 JetBrainsがGoLand 2026.1をリリース。Go 1.26の新機能へのガイド付きシンタックスアップデートにより、コードベース全体への新機能適用が容易になった。
 
-### AI アシスタントの普及
+### 2025年 Go開発者サーベイ（5,379人回答）
 
-- **Go開発者の70%** がAIアシスタントを日常的に使用
+| エディタ | シェア |
+|---------|--------|
+| VS Code | 37% |
+| GoLand | 28% |
+| Zed | 4% |
+| Cursor | 4% |
+
+- **Go開発者の70%以上** がAIアシスタントを日常的に使用
+- ただしAI出力への **満足度は55%** にとどまる（動作しないコード・低品質コードが主な不満）
 - Claude Code、GitHub Copilot、Cursor等がGoの開発ワークフローに深く統合
 
 **参考リンク:**
 - [GoLand 2026.1 Is Released - GoLand Blog](https://blog.jetbrains.com/go/2026/03/26/goland-2026-1-is-released/)
 - [State of Go 2026 - The Dev Newsletter](https://devnewsletter.com/p/state-of-go-2026/)
+- [Results from the 2025 Go Developer Survey](https://go.dev/blog/survey2025)
 
 ---
 
 ## 📊 市場動向・採用状況
 
-- Goはバックエンド開発・クラウドインフラ・CLIツール開発の分野で事実上の標準言語として定着
-- IoTデバイス・エッジゲートウェイでの採用が拡大（低メモリフットプリント・高実行速度が評価）
+### 開発者数と成長
+
+- プロフェッショナル開発者 **220万人** がGoを主要言語として使用（5年前の2倍）
+- 副次的ユーザーを含めると **500万人超**
+- **TIOBE Index 7位**（2025年4月時点、Go史上最高順位）
+- **JetBrains Language Promise Index 4位**（TypeScript、Rust、Pythonに次ぐ）
+- **全ソフトウェア開発者の11%** がGoの採用を計画中
+
+### 主な利用分野
+
+- **バックエンドAPI/マイクロサービス**: 引き続き最大の使用領域
+- **クラウドインフラ/DevOps**: Kubernetes、Terraform等の中核
+- **AIツーリング/MCPサーバー**: 2025-2026年に急成長した新領域
+- **IoT/エッジコンピューティング**: 低メモリフットプリントと高並行性が評価され拡大中
+
+### 今後の展望
+
 - Go 1.27は2026年8月リリース予定。旧GCの完全削除、goroutineリークプロファイルのデフォルト有効化が見込まれる
+- `encoding/json/v2` の正式採用に向けた検討が継続中
+- ジェネリックメソッドの実装が進行中
 
 ---
 
